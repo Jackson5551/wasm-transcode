@@ -1,0 +1,69 @@
+# Node / frontend / Vue
+node_modules/
+dist/
+build/
+.vite/
+.cache/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Spin WASM build outputs
+*.wasm
+*.wasm.map
+*.wat
+*.tmp.wasm
+*.spwasm
+target/
+build/
+
+# Rust (if any part uses it, common in Spin projects)
+Cargo.lock
+Cargo.toml.orig
+
+# Spin configs
+spin.lock
+
+# Local env files
+.env
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Experiments / CloudLab outputs
+experiments/data/*
+!experiments/data/.gitkeep
+*.csv
+*.tsv
+*.jsonl
+
+# Test coverage / reports
+coverage/
+*.lcov
+test-results/
+
+# Misc
+*.bak
+*.orig
+*.rej
+*.tmp
+*.out
+
+# Optional: if you use S3/Garage or store media locally in dev
+uploads/
+media/
+output/
