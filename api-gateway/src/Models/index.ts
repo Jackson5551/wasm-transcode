@@ -11,3 +11,22 @@ const sequelize: Sequelize = new Sequelize(db, username, password, {
     port: parseInt(port),
     logging: false
 });
+
+import {Job} from "./Job";
+import {File} from "./File";
+import {JobStatusUpdate} from "./JobStatusUpdate";
+
+Job.initialize(sequelize);
+File.initialize(sequelize);
+JobStatusUpdate.initialize(sequelize);
+
+Job.associate();
+File.associate();
+JobStatusUpdate.associate();
+
+export {
+    sequelize,
+    Job,
+    File,
+    JobStatusUpdate,
+}
