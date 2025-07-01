@@ -89,3 +89,10 @@ export class Job extends Model {
         });
     }
 }
+
+export interface IJobForm {
+    input_path: string;
+    output_path: string;
+    input_format: string;
+    output_format: string;
+}
