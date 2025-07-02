@@ -50,7 +50,7 @@ class JobService {
         try {
             const job = await Job.create({...data}, {transaction});
             await transaction.commit();
-            log("green", "JOB", `Created job: ${job.title}`);
+            log("green", "JOB", `Created job: ${job.id}`);
             return [true, job];
         } catch (error: any) {
             await transaction.rollback();
@@ -60,6 +60,59 @@ class JobService {
     }
 
     public async getJobById(id: string): Promise<[boolean, Job?, Error?]> {
+        try {
+            const job = await Job.findByPk(id);
+            if (!job) {
+                log("yellow", "JOB", `Job not found by ID: ${id}`);
+                return [true, undefined, new Error("Could not find Job with id " + id)];
+            }
 
+            log("green", "JOB", `Found Job with id ${id}`);
+            return [true, job];
+        } catch (error: any) {
+            log("red", "JOB", `Error retrieving Job by ID ${id}: ${error.message}`);
+            return [false, undefined, error];
+
+        }
+    }
+
+    public async updateJobById(id: string, data: IJobForm): Promise<[boolean, Job?, Error?]> {
+        try {
+            const job = await Job.findByPk(id);
+
+            if (!job) {
+                log("yellow", "JOB", `Update failed: job not found with ID ${id}`);
+                return [true, undefined, new Error("Could not find job with id " + id)];
+            }
+
+            log("green", "JOB", `Updated job: ${job.id}`);
+            return [true, job];
+        } catch (error: any) {
+            log("red", "JOB", `Failed to update job: ${error.message}`);
+            return [false, undefined, error];
+        }
+    }
+
+    public async deleteJobById(id: string): Promise<[boolean, Error?]> {
+        const transaction: Transaction = await Job.sequelize!.transaction();
+
+        try {
+            const job = await Job.findByPk(id, {transaction});
+            if (!job) {
+                log("yellow", "JOB", `Job not found with ID ${id}`);
+                return [true, new Error("Could not find job with id " + id)];
+            }
+
+            await job.destroy();
+            await transaction.commit();
+
+            log("green", "JOB", `Deleted job: ${job.id}`);
+            return [true];
+        } catch (error: any) {
+            log("red", "JOB", `Failed to delete job: ${error.message}`);
+            return [false, error];
+        }
     }
 }
+
+export default new JobService();
