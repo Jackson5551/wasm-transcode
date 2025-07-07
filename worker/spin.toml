@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["jackson"]
+description = ""
+name = "worker"
+version = "0.1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "worker"
+
+[component.worker]
+source = "dist/worker.wasm"
+exclude_files = ["**/node_modules"]
+[component.worker.build]
+command = ["npm install", "npm run build"]
+watch = ["src/**/*.ts"]
