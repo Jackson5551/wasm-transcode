@@ -43,6 +43,7 @@ class S3Service {
             },
             endpoint: process.env.S3_ENDPOINT!,
             region: process.env.S3_REGION!,
+            forcePathStyle: true
         });
 
         this._bucket = process.env.S3_BUCKET!;

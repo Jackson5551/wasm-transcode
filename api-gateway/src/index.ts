@@ -41,4 +41,4 @@ const server = http.createServer(app);
 
 server.listen(port, async () => {
   log("cyan", 'SERVER', 'Server listening on port ' + port);
-})
+});

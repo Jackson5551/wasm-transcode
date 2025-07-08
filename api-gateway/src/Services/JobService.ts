@@ -1,7 +1,7 @@
-import {Op, Transaction} from "sequelize";
-import {log} from "../Logger";
-import {Job} from "../Models";
-import {IJobForm} from "../Models/Job";
+import { Op, Transaction } from "sequelize";
+import { log } from "../Logger";
+import { Job } from "../Models";
+import { IJobForm } from "../Models/Job";
 
 class JobService {
     public async paginateJobs(itemsPerPage: number, page: number, sort: string, search: string): Promise<{
@@ -23,7 +23,7 @@ class JobService {
             log("magenta", "JOB", `Searching jobs for title: "${search}"`);
         }
 
-        const count: number = await Job.count({where: whereClause});
+        const count: number = await Job.count({ where: whereClause });
 
         const jobs = await Job.findAll({
             where: whereClause,
@@ -44,11 +44,11 @@ class JobService {
         }
     }
 
-    public async createJob(data:IJobForm): Promise<[boolean, Job?, Error?]> {
+    public async createJob(data: IJobForm): Promise<[boolean, Job?, Error?]> {
         const transaction: Transaction = await Job.sequelize!.transaction();
 
         try {
-            const job = await Job.create({...data}, {transaction});
+            const job = await Job.create({ ...data }, { transaction });
             await transaction.commit();
             log("green", "JOB", `Created job: ${job.id}`);
             return [true, job];
@@ -97,7 +97,7 @@ class JobService {
         const transaction: Transaction = await Job.sequelize!.transaction();
 
         try {
-            const job = await Job.findByPk(id, {transaction});
+            const job = await Job.findByPk(id, { transaction });
             if (!job) {
                 log("yellow", "JOB", `Job not found with ID ${id}`);
                 return [true, new Error("Could not find job with id " + id)];
@@ -113,6 +113,27 @@ class JobService {
             return [false, error];
         }
     }
+
+    public async setInputFile(jobId: string, fileUrl: string): Promise<[boolean, Job?, Error?]> {
+        const transaction: Transaction = await Job.sequelize!.transaction();
+
+        try {
+            const job = await Job.findByPk(jobId, { transaction });
+            if (!job) throw new Error("Job not found");
+
+            job.input_path = fileUrl;
+            await job.save({ transaction });
+
+            await transaction.commit();
+            log("blue", "JOB", `Updated input_file for job: ${jobId}`);
+            return [true, job];
+        } catch (error: any) {
+            await transaction.rollback();
+            log("red", "JOB", `Failed to update input_file: ${error.message}`);
+            return [false, undefined, error];
+        }
+    }
+
 }
 
 export default new JobService();

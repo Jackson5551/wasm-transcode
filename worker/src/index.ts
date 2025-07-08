@@ -10,7 +10,27 @@ let router = AutoRouter();
 router
   .get('/', () => new Response('Hello, Spin!'))
   .get('/hello/:name', ({ name }) => `Hello, ${name}!`)
-  .get('/uploads/:id', ({id}) => `File: ${id}`)
+  .post('/process', async (request) => {
+    const job = await request.json();
+
+    // Simulate processing
+    console.log('[SPIN] Received job:', job);
+
+    // (Optional) Send progress/status back to API
+    await fetch('http://localhost:8900/api/jobs/job-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        job_id: job.job_id,
+        status: 'processing',
+        message: 'Started transcoding',
+      }),
+    });
+
+    // Perform the actual work...
+
+    return new Response('Job received');
+  });
 
 //@ts-ignore
 addEventListener('fetch', (event: FetchEvent) => {

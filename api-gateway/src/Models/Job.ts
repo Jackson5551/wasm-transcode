@@ -5,12 +5,12 @@ import {JobStatusUpdate} from "./JobStatusUpdate";
 
 export class Job extends Model {
     declare readonly id: string;
-    declare readonly input_path: string;
-    declare readonly output_path: string;
-    declare readonly input_format: string;
-    declare readonly output_format: string;
-    declare readonly status: JobStatus;
-    declare readonly progress: number;
+    declare input_path: string;
+    declare output_path: string;
+    declare input_format: string;
+    declare output_format: string;
+    declare status: JobStatus;
+    declare progress: number;
     declare readonly error_message: string;
     declare readonly created_at: string;
     declare readonly updated_at: string;
@@ -25,7 +25,8 @@ export class Job extends Model {
                 },
                 input_path: {
                     type: DataTypes.STRING,
-                    allowNull: false
+                    allowNull: true,
+                    defaultValue: ""
                 },
                 output_path: {
                     type: DataTypes.STRING,
@@ -69,6 +70,7 @@ export class Job extends Model {
             },
             {
                 sequelize,
+                tableName: "Jobs",
                 modelName: "job",
                 timestamps: true,
                 createdAt: "created_at",

@@ -13,6 +13,7 @@ component = "worker"
 [component.worker]
 source = "dist/worker.wasm"
 exclude_files = ["**/node_modules"]
+allowed_outbound_hosts = ["http://localhost:8900"]
 [component.worker.build]
 command = ["npm install", "npm run build"]
 watch = ["src/**/*.ts"]
