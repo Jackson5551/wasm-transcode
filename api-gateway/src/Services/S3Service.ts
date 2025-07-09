@@ -1,8 +1,10 @@
 import {
-    S3,
     GetObjectCommand,
     DeleteObjectCommand,
+    PutObjectCommand,
+    S3Client,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Upload } from "@aws-sdk/lib-storage";
 import fs from "fs";
 import { Readable } from "stream";
@@ -32,11 +34,11 @@ interface DeletedFileInfo {
  * but with result=undefined and an error describing the missing file.
  */
 class S3Service {
-    private _s3: S3;
+    private _s3: S3Client;
     private readonly _bucket: string;
 
     constructor() {
-        this._s3 = new S3({
+        this._s3 = new S3Client({
             credentials: {
                 accessKeyId: process.env.S3_KEY!,
                 secretAccessKey: process.env.S3_SECRET!,
@@ -189,6 +191,54 @@ class S3Service {
 
         log("green", "REPLACE", `Replaced file in S3: ${key}`);
         return [true, result];
+    }
+
+    /**
+     * Generates a presigned GET URL for downloading a file from S3.
+     * @param key - The S3 key of the file.
+     * @param expiresIn - Expiration time in seconds (default: 3600).
+     * @returns [success, {url, key}] or [false, undefined, Error]
+     */
+    public async generatePresignedUrl(
+        key: string,
+        expiresIn: number = 3600
+    ): Promise<[boolean, UploadedFileInfo?, Error?]> {
+        try {
+            const command = new GetObjectCommand({
+                Bucket: this._bucket,
+                Key: key,
+            });
+
+            // @ts-ignore
+            const url = await getSignedUrl(this._s3, command, { expiresIn });
+
+            return [true, { url, key }];
+        } catch (error: any) {
+            log("red", "SIGNED-URL", `Failed to generate GET presigned URL for ${key}: ${error.message}`);
+            return [false, undefined, error];
+        }
+    }
+
+    public async generatePutPresignedUrl(
+        key: string,
+        contentType: string,
+        expiresIn: number = 3600
+    ): Promise<[boolean, UploadedFileInfo?, Error?]> {
+        try {
+            const command = new PutObjectCommand({
+                Bucket: this._bucket,
+                Key: key,
+                ContentType: contentType,
+            });
+
+            // @ts-ignore
+            const url = await getSignedUrl(this._s3, command, { expiresIn });
+
+            return [true, { url, key }];
+        } catch (error: any) {
+            log("red", "SIGNED-URL", `Failed to generate PUT presigned URL for ${key}: ${error.message}`);
+            return [false, undefined, error];
+        }
     }
 }
 

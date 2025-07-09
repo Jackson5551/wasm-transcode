@@ -134,6 +134,25 @@ class JobService {
         }
     }
 
+    public async setOutputFile(jobId: string, fileUrl: string): Promise<[boolean, Job?, Error?]> {
+        const transaction: Transaction = await Job.sequelize!.transaction();
+
+        try {
+            const job = await Job.findByPk(jobId, { transaction });
+            if (!job) throw new Error("Job not found");
+
+            job.output_path = fileUrl;
+            await job.save({ transaction });
+
+            await transaction.commit();
+            log("blue", "JOB", `Updated input_file for job: ${jobId}`);
+            return [true, job];
+        } catch (error: any) {
+            await transaction.rollback();
+            log("red", "JOB", `Failed to update input_file: ${error.message}`);
+            return [false, undefined, error];
+        }
+    }
 }
 
 export default new JobService();

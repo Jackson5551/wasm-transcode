@@ -13,12 +13,13 @@ async function pollAndDispatch() {
 
         // Lock a queued job
         const [rows] = await conn.execute(`
-      SELECT * FROM Jobs
-      WHERE status = 'queued'
-      ORDER BY created_at ASC
-      LIMIT 1
-      FOR UPDATE;
-    `);
+            SELECT * FROM Jobs
+            WHERE status = 'queued'
+              AND ready = true
+            ORDER BY created_at ASC
+                LIMIT 1
+            FOR UPDATE;
+        `);
 
         if (rows.length === 0) {
             await conn.commit();
@@ -37,19 +38,27 @@ async function pollAndDispatch() {
 
         // Insert status update
         await conn.execute(`
-      INSERT INTO JobStatusUpdates (job_id, status, message, created_at)
-      VALUES (?, ?, ?, NOW())
-    `, [job.id, 'processing', `Dispatched to Spin by ${process.env.WORKER_ID}`]);
+      INSERT INTO JobStatusUpdates (job_id, status, created_at)
+      VALUES (?, ?, NOW())
+    `, [job.id, 'processing']);
 
         await conn.commit();
         logStatus(job.id, 'processing', 'Job locked and marked as processing');
 
         // Send job to Spin
+        console.log({
+            job_id: job.id,
+            input_format: job.input_format,
+            output_format: job.output_format,
+            input_path: job.input_path,
+            output_path: job.output_path,
+        });
         const res = await axios.post(process.env.SPIN_ENDPOINT, {
             job_id: job.id,
             input_format: job.input_format,
             output_format: job.output_format,
             input_path: job.input_path,
+            output_path: job.output_path,
         });
 
         if (res.status >= 200 && res.status < 300) {
@@ -59,7 +68,7 @@ async function pollAndDispatch() {
         }
     } catch (err) {
         await conn.rollback();
-        console.error('[ERROR]', err);
+        // console.error('[ERROR]', err);
     } finally {
         await conn.end();
     }

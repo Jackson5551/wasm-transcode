@@ -9,6 +9,7 @@ export class Job extends Model {
     declare output_path: string;
     declare input_format: string;
     declare output_format: string;
+    declare ready: boolean;
     declare status: JobStatus;
     declare progress: number;
     declare readonly error_message: string;
@@ -24,12 +25,12 @@ export class Job extends Model {
                     primaryKey: true
                 },
                 input_path: {
-                    type: DataTypes.STRING,
+                    type: DataTypes.TEXT,
                     allowNull: true,
                     defaultValue: ""
                 },
                 output_path: {
-                    type: DataTypes.STRING,
+                    type: DataTypes.TEXT,
                     allowNull: true
                 },
                 input_format: {
@@ -39,6 +40,11 @@ export class Job extends Model {
                 output_format: {
                     type: DataTypes.STRING,
                     allowNull: true
+                },
+                ready: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false,
+                    defaultValue: false
                 },
                 status: {
                     type: DataTypes.ENUM(...Object.values(JobStatus)),

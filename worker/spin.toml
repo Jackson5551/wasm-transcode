@@ -13,7 +13,14 @@ component = "worker"
 [component.worker]
 source = "dist/worker.wasm"
 exclude_files = ["**/node_modules"]
-allowed_outbound_hosts = ["http://localhost:8900"]
+allowed_outbound_hosts = [
+    "http://localhost:8900",
+    "http://localhost:3000",
+    "http://localhost:9000",
+    "http://127.0.0.1:3000",   # 👈 must be exact
+    "http://127.0.0.1:9000"    # if accessing minio this way too
+]
+allowed_http_hosts = ["http://*"]
 [component.worker.build]
 command = ["npm install", "npm run build"]
 watch = ["src/**/*.ts"]
