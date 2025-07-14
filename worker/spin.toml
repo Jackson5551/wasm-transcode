@@ -18,9 +18,14 @@ allowed_outbound_hosts = [
     "http://localhost:3000",
     "http://localhost:9000",
     "http://127.0.0.1:3000",   # 👈 must be exact
-    "http://127.0.0.1:9000"    # if accessing minio this way too
+    "http://127.0.0.1:9000",    # if accessing minio this way too
+    "http://localhost:8081",
+    "http://127.0.0.1:8081"
 ]
 allowed_http_hosts = ["http://*"]
 [component.worker.build]
 command = ["npm install", "npm run build"]
 watch = ["src/**/*.ts"]
+
+#[component.worker.environment]
+#SPIN_COMPONENT_MODEL = "js"

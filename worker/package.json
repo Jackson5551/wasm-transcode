@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx webpack && mkdirp dist && j2w -i build/bundle.js -o dist/worker.wasm",
+    "build_js": "npx webpack && mkdirp dist && cp build/bundle.js dist/worker.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,11 +19,6 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@ffmpeg/core": "^0.12.10",
-    "@ffmpeg/core-mt": "^0.12.10",
-    "@ffmpeg/ffmpeg": "^0.12.15",
-    "@ffmpeg/types": "^0.12.4",
-    "@ffmpeg/util": "^0.12.2",
     "@spinframework/build-tools": "^1.0.1",
     "@spinframework/wasi-http-proxy": "^1.0.0",
     "itty-router": "^5.0.18"

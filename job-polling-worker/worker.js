@@ -59,6 +59,11 @@ async function pollAndDispatch() {
             output_format: job.output_format,
             input_path: job.input_path,
             output_path: job.output_path,
+        }, {
+            // headers: {
+            //     'Cross-Origin-Opener-Policy': 'same-origin',
+            //     'Cross-Origin-Embedder-Policy': 'require-corp',
+            // }
         });
 
         if (res.status >= 200 && res.status < 300) {
