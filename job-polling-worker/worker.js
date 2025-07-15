@@ -46,24 +46,14 @@ async function pollAndDispatch() {
         logStatus(job.id, 'processing', 'Job locked and marked as processing');
 
         // Send job to Spin
-        console.log({
-            job_id: job.id,
-            input_format: job.input_format,
-            output_format: job.output_format,
-            input_path: job.input_path,
-            output_path: job.output_path,
-        });
         const res = await axios.post(process.env.SPIN_ENDPOINT, {
             job_id: job.id,
             input_format: job.input_format,
             output_format: job.output_format,
             input_path: job.input_path,
             output_path: job.output_path,
+            api_gateway_url: process.env.API_GATEWAY_URL
         }, {
-            // headers: {
-            //     'Cross-Origin-Opener-Policy': 'same-origin',
-            //     'Cross-Origin-Embedder-Policy': 'require-corp',
-            // }
         });
 
         if (res.status >= 200 && res.status < 300) {
@@ -73,13 +63,13 @@ async function pollAndDispatch() {
         }
     } catch (err) {
         await conn.rollback();
-        // console.error('[ERROR]', err);
+        console.error('[ERROR]', err);
     } finally {
         await conn.end();
     }
 }
 
-// ⏲️ Poll every 5 seconds
+// Poll every 5 seconds
 setInterval(() => {
     pollAndDispatch().catch(console.error);
 }, 5000);

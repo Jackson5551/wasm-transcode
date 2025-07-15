@@ -35,16 +35,14 @@ class JobController {
             const allowedKeys: (keyof IJobForm)[] = ["input_format", "output_format"];
             const filteredData = DataSanitizer.filterAllowedKeys<IJobForm>(jobData, allowedKeys);
 
-            // 1. Create job first
+            // Create job first
             const [success, job, error] = await JobService.createJob(filteredData);
 
             if (!success || !job) {
                 return res.status(500).json({error: `Could not create job. ${error}`});
             }
 
-            // 2. Generate S3 key using job.id
-
-            // const extension = file.mimetype.split("/")[1];
+            // Generate S3 key using job.id
             const extension = path.extname(file.originalname).replace('.', '') || 'bin';
             const inputKey = `jobs/${job.id}/${crypto.randomBytes(20).toString('hex')}.${extension}`;
             const contentType = file.mimetype;
@@ -57,13 +55,13 @@ class JobController {
                 return res.status(500).json({error: `S3 upload failed: ${s3_error}`});
             }
 
-            // 3. Generate presigned GET URL for input file
+            // Generate presigned GET URL for input file
             const [signedOk, signedInfo, signedError] = await S3Service.generatePresignedUrl(inputKey);
             if (!signedOk || !signedInfo) {
                 return res.status(500).json({error: `Could not sign input file: ${signedError}`});
             }
 
-            // 4. Update job with input_path
+            // Update job with input_path
             const fileUrl = signedInfo.url;
             console.log(fileUrl);
             const [updateSuccess, updatedJob, updateError] = await JobService.setInputFile(job.id, fileUrl);
@@ -72,20 +70,19 @@ class JobController {
             }
             console.log("Job updated with signed Input URL");
 
-            // 5. Generate presigned PUT URL for output
+            // Generate presigned PUT URL for output
             const ext = job.output_format?.toLowerCase() || 'bin';
-            console.log(ext);
             const outputMime = MimeTypeUtils.getMimeFromExtension(ext) || 'application/octet-stream';
             log("cyan", "MIME", `Resolved output MIME type: ${outputMime}`);
+
             const outputKey = `jobs/${job.id}/output.${job.output_format}`;
-            console.log(outputMime, outputKey);
+
             const [putOk, putInfo, putErr] = await S3Service.generatePutPresignedUrl(outputKey, outputMime);
-            console.log(putOk, putInfo, outputMime);
             if (!putOk || !putInfo) {
                 return res.status(500).json({error: `Could not generate output URL: ${putErr}`});
             }
 
-            // 6. Optional: store outputKey or URL if needed
+            // Store outputKey or URL
             const [setOutputSuccess, finalJobObject, setOutputError] = await JobService.setOutputFile(job.id, putInfo.url);
             console.log(setOutputSuccess, finalJobObject?.output_path);
 
@@ -93,7 +90,7 @@ class JobController {
                 return res.status(500).json({error: `Failed to update job: ${setOutputError}`});
             }
 
-            // 7. Mark job as ready to be processed
+            // Mark job as ready to be processed
             await Job.update({ready: true}, {
                 where: {
                     id: finalJobObject.id

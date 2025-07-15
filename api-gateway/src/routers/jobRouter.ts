@@ -12,13 +12,14 @@ const upload = multer({
 }); // Temporary Storage
 
 
+//@ts-ignore
 router.post("/", upload.single("file"), JobController.store);
+//@ts-ignore
 router.post('/job-status', async (req, res) => {
   const { job_id, status, message } = req.body;
-
+  console.log("[PROCESS-FINISHED] Job status", status);
   // Update job in DB
-  await Job.update({ status, status_message: message }, { where: { id: job_id } });
-
+  await Job.update({ status }, { where: { id: job_id } });
   log("cyan",`[STATUS]`, `Job ${job_id} → ${status}: ${message}`);
   return res.sendStatus(200);
 });

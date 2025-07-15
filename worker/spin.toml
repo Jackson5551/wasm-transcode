@@ -12,6 +12,7 @@ component = "worker"
 
 [component.worker]
 source = "dist/worker.wasm"
+environment = { API_GATEWAY_URL = "http://localhost:8900" }
 exclude_files = ["**/node_modules"]
 allowed_outbound_hosts = [
     "http://localhost:8900",
