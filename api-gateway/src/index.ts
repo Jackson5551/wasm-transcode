@@ -6,6 +6,8 @@ import path from "path";
 import * as http from "node:http";
 import { log } from "./Logger";
 import router from "./router";
+import { Server as SocketServer } from "socket.io";
+import {WorkerManager} from "./Services/WorkerManager";
 
 const app: Express = express();
 const port = process.env.PORT || 8900;
@@ -38,6 +40,12 @@ app.use(cookieParser());
 app.use("/api", router);
 
 const server = http.createServer(app);
+
+const workerManager = new WorkerManager(server);
+
+app.get('/workers', (req, res) => {
+  res.json(workerManager.getActiveWorkers());
+});
 
 server.listen(port, async () => {
   log("cyan", 'SERVER', 'Server listening on port ' + port);

@@ -14,7 +14,9 @@ router
     .get('/hello/:name', ({name}) => `Hello, ${name}!`)
     .post('/process', transcodeHandler.handleRequest)
     .post('/finished', processFinishedHandler.handleRequest)
-    .post('/failed', processFailedHandler.handleRequest);
+    .post('/failed', processFailedHandler.handleRequest)
+
+let started = false;
 
 //@ts-ignore
 addEventListener('fetch', (event: FetchEvent) => {
