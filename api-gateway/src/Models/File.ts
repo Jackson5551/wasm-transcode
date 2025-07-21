@@ -59,7 +59,13 @@ export class File extends Model {
                 timestamps: true,
                 createdAt: "created_at",
                 updatedAt: "updated_at",
-                deletedAt: false
+                deletedAt: false,
+                defaultScope: {
+                    include: [{
+                        model: Job,
+                        as: "job"
+                    }]
+                }
             }
         );
     }

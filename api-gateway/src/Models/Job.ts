@@ -5,6 +5,7 @@ import {JobStatusUpdate} from "./JobStatusUpdate";
 
 export class Job extends Model {
     declare readonly id: string;
+    declare readonly file_name: string;
     declare input_path: string;
     declare output_path: string;
     declare input_format: string;
@@ -13,8 +14,8 @@ export class Job extends Model {
     declare status: JobStatus;
     declare progress: number;
     declare readonly error_message: string;
-    declare readonly created_at: string;
-    declare readonly updated_at: string;
+    declare readonly created_at: Date;
+    declare updated_at: Date;
 
     public static initialize(sequelize: Sequelize) {
         this.init(
@@ -23,6 +24,10 @@ export class Job extends Model {
                     type: DataTypes.UUID,
                     defaultValue: DataTypes.UUIDV4,
                     primaryKey: true
+                },
+                file_name: {
+                    type: DataTypes.STRING,
+                    allowNull: false
                 },
                 input_path: {
                     type: DataTypes.TEXT,
@@ -99,6 +104,7 @@ export class Job extends Model {
 }
 
 export interface IJobForm {
+    file_name: string;
     input_path: string;
     output_path: string;
     input_format: string;

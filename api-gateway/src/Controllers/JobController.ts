@@ -36,7 +36,7 @@ class JobController {
             const filteredData = DataSanitizer.filterAllowedKeys<IJobForm>(jobData, allowedKeys);
 
             // Create job first
-            const [success, job, error] = await JobService.createJob(filteredData);
+            const [success, job, error] = await JobService.createJob({...filteredData, file_name: file.originalname});
 
             if (!success || !job) {
                 return res.status(500).json({error: `Could not create job. ${error}`});
@@ -44,7 +44,7 @@ class JobController {
 
             // Generate S3 key using job.id
             const extension = path.extname(file.originalname).replace('.', '') || 'bin';
-            const inputKey = `jobs/${job.id}/${crypto.randomBytes(20).toString('hex')}.${extension}`;
+            const inputKey = `jobs/${job.id}/${file.originalname}`;
             const contentType = file.mimetype;
 
             log("cyan", "UPLOAD", "Starting upload to s3");

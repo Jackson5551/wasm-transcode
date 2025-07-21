@@ -8,6 +8,7 @@ import { log } from "./Logger";
 import router from "./router";
 import { Server as SocketServer } from "socket.io";
 import {WorkerManager} from "./Services/WorkerManager";
+import './crons'
 
 const app: Express = express();
 const port = process.env.PORT || 8900;
@@ -21,6 +22,8 @@ const port = process.env.PORT || 8900;
  */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cors());
 
 /**
  * This tells Express to treat `X-Forwarded-For` headers as reliable and use them for `req.ip`
