@@ -16,7 +16,7 @@ class JobController {
             const sort = (req.query.sort as string) ?? '';
             const search = (req.query.search as string) ?? '';
 
-            const result = JobService.paginateJobs(itemsPerPage, page, sort, search);
+            const result = await JobService.paginateJobs(itemsPerPage, page, sort, search);
 
             return res.json(result);
         } catch (error) {

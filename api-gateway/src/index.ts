@@ -6,7 +6,7 @@ import path from "path";
 import * as http from "node:http";
 import { log } from "./Logger";
 import router from "./router";
-import { Server as SocketServer } from "socket.io";
+import { Server } from "socket.io";
 import {WorkerManager} from "./Services/WorkerManager";
 import './crons'
 
@@ -44,10 +44,17 @@ app.use("/api", router);
 
 const server = http.createServer(app);
 
-const workerManager = new WorkerManager(server);
+const io = new Server(server, {
+  cors: {
+    origin: '*', // Adjust this to match your frontend origin in production
+  },
+});
+
+// Initialize the WorkerManager with the Socket.IO server
+export const manager = new WorkerManager(io);
 
 app.get('/workers', (req, res) => {
-  res.json(workerManager.getActiveWorkers());
+  res.json(manager.getActiveWorkers());
 });
 
 server.listen(port, async () => {

@@ -12,7 +12,6 @@ export async function handleRequest(req: Request): Promise<Response> {
         console.error(`[ERROR] ${error}`);
 
         await reportJobStatus(job_id, 'failed', 'Job failed');
-
         return new Response(
             JSON.stringify({ acknowledged: true }),
             { status: 200, headers: { "Content-Type": "application/json" } }

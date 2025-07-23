@@ -3,6 +3,7 @@ import {AutoRouter} from 'itty-router';
 import * as transcodeHandler from "./transcodeHandler"
 import * as processFinishedHandler from "./processFinishedHandler";
 import * as processFailedHandler from "./processFailedHandler";
+import * as registerHandler from "./registerHandler";
 
 let router = AutoRouter();
 
@@ -11,7 +12,7 @@ let router = AutoRouter();
 // Any unmatched route will return a 404
 router
     .get('/', () => new Response('Hello, Spin!'))
-    .get('/hello/:name', ({name}) => `Hello, ${name}!`)
+    .post('/register', registerHandler.handleRequest)
     .post('/process', transcodeHandler.handleRequest)
     .post('/finished', processFinishedHandler.handleRequest)
     .post('/failed', processFailedHandler.handleRequest)

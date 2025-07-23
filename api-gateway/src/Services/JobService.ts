@@ -13,21 +13,21 @@ class JobService {
         const usePagination: boolean = itemsPerPage > 0;
 
         const whereClause: any = {
-            deleted_at: null,
+            // deleted_at: null,
         };
 
-        if (search?.trim()) {
-            whereClause.title = {
-                [Op.like]: `%${search}%`
-            };
-            log("magenta", "JOB", `Searching jobs for title: "${search}"`);
-        }
+        // if (search?.trim()) {
+        //     whereClause.title = {
+        //         [Op.like]: `%${search}%`
+        //     };
+        //     log("magenta", "JOB", `Searching jobs for title: "${search}"`);
+        // }
 
-        const count: number = await Job.count({ where: whereClause });
+        const count: number = await Job.count();
 
         const jobs = await Job.findAll({
-            where: whereClause,
-            order: [['title', 'ASC']],
+            // where: whereClause,
+            order: [['created_at', 'DESC']],
             ...(usePagination && {
                 offset: (page - 1) * itemsPerPage,
                 limit: itemsPerPage

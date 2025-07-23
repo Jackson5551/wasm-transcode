@@ -15,6 +15,8 @@ const upload = multer({
 //@ts-ignore
 router.post("/", upload.single("file"), JobController.store);
 //@ts-ignore
+router.get("/", JobController.index);
+//@ts-ignore
 router.post('/job-status', async (req, res) => {
     const {job_id, status, message} = req.body;
     console.log("[PROCESS-FINISHED] Job status", status);

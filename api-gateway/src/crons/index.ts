@@ -3,6 +3,7 @@ import {Job, JobStatusUpdate, sequelize} from "../Models";
 import {log} from "../Logger";
 import axios from "axios";
 import {JobStatus} from "../Enums/JobStatus";
+import {manager} from "../index";
 
 /**
  * Cron that sends ready jobs to the workers.
@@ -55,23 +56,29 @@ cron.schedule('*/5 * * * * *', async () => {
 
         const job = result;
 
-        // Send job to Spin
-        const res = await axios.post(
-            process.env.SPIN_ENDPOINT! + '/process',
-            {
-                job_id: job.id,
-                input_format: job.input_format,
-                output_format: job.output_format,
-                input_path: job.input_path,
-                output_path: job.output_path,
-                api_gateway_url: process.env.API_GATEWAY_URL,
-            }
-        );
+        const workers = manager.getActiveWorkers();
 
-        if (res.status >= 200 && res.status < 300) {
-            log('cyan', 'dispatched', 'Job sent to Spin worker successfully');
-        } else {
-            throw new Error(`Spin responded with status ${res.status}`);
+        for (const worker of workers) {
+            if(worker.status === 'idle') {
+                // Send job to Spin
+                const res = await axios.post(
+                    worker.address! + '/process',
+                    {
+                        job_id: job.id,
+                        input_format: job.input_format,
+                        output_format: job.output_format,
+                        input_path: job.input_path,
+                        output_path: job.output_path,
+                        api_gateway_url: process.env.API_GATEWAY_URL,
+                    }
+                );
+
+                if (res.status >= 200 && res.status < 300) {
+                    log('cyan', 'dispatched', 'Job sent to Spin worker successfully');
+                } else {
+                    throw new Error(`Spin responded with status ${res.status}`);
+                }
+            }
         }
     } catch (err) {
         console.error('[ERROR]', err);

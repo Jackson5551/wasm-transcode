@@ -14,21 +14,8 @@ const tableHeaders = [
   {title: 'Actions', key: 'actions', sortable: false},
 ]
 
-const filteredMedia = computed(() => {
-  if (!search.value) return mediaFiles.value
-  return mediaFiles.value.filter(file =>
-      file.name.toLowerCase().includes(search.value.toLowerCase())
-  )
-})
-
 function downloadMedia(item) {
   window.open(item.path, '_blank')
-}
-
-function deleteMedia(item) {
-  console.log('Delete media:', item)
-  // TODO: API call to delete + refresh mediaFiles
-  mediaFiles.value = mediaFiles.value.filter(f => f.id !== item.id)
 }
 
 const tableData = ref({
@@ -53,7 +40,7 @@ const fetchMedia = async ({page, itemsPerPage}) => {
 }
 
 onMounted(() => {
-  fetchMedia()
+  fetchMedia({page: tableData.value.currentPage, itemsPerPage: 10});
 })
 </script>
 <template>

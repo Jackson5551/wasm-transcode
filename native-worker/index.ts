@@ -3,22 +3,40 @@ import {writeFile, readFile, rm, access, mkdtemp} from "fs/promises";
 import {tmpdir} from "os";
 import {join} from "path";
 import MimeTypeUtils from "./MimeTypeUtils.ts";
+import {io} from "socket.io-client";
 
-// const JOB_STATUS_URL = Bun.env.JOB_STATUS_URL ?? "http://localhost:3000/job-status"; // Spin API Gateway
-//
-// // Helper to update job status
-// async function reportJobStatus(job_id: string, status: "completed" | "failed", message?: string) {
-//     try {
-//         await fetch(JOB_STATUS_URL, {
-//             method: "POST",
-//             headers: {"Content-Type": "application/json"},
-//             body: JSON.stringify({job_id, status, message}),
-//         });
-//         console.log(`[JOB STATUS] Reported '${status}' for job ${job_id}`);
-//     } catch (err) {
-//         console.error(`[JOB STATUS ERROR] Failed to report job ${job_id}:`, err);
-//     }
-// }
+const SOCKET_URL = Bun.env.SOCKET_URL ?? "http://localhost:3000";
+const WORKER_ID = crypto.randomUUID();
+const WORKER_ADDRESS = Bun.env.PUBLIC_URL ?? "http://localhost:8081";
+let currentJobId = "";
+let currentStatus = "idle";
+
+const socket = io(SOCKET_URL, {
+    transports: ["websocket"],
+});
+
+socket.on("connect", () => {
+    console.log(`[SOCKET] Connected as ${socket.id}`);
+    socket.emit("register", {
+        id: WORKER_ID,
+        address: WORKER_ADDRESS,
+        job_id: currentJobId,
+        status: currentStatus,
+    });
+});
+
+setInterval(() => {
+    socket.emit("heartbeat", {
+        id: WORKER_ID,
+        address: WORKER_ADDRESS,
+        job_id: currentJobId,
+        status: currentStatus,
+    });
+}, 5000);
+
+socket.on("disconnect", () => {
+    console.log(`[SOCKET] Disconnected`);
+});
 
 async function processJob({
                               job_id,
@@ -34,6 +52,9 @@ async function processJob({
     output_format: string;
 }): Promise<void> {
     console.log(`[NATIVE WORKER] Received job ${job_id}`);
+
+    currentJobId = job_id;
+    currentStatus = "processing";
 
     const inputName = `input.${input_format}`;
     const outputName = `output.${output_format}`;
@@ -103,6 +124,7 @@ async function processJob({
         // await reportJobStatus(job_id, "failed", String(err));
     } finally {
         await rm(tmpDir, {recursive: true, force: true});
+        currentStatus = "idle";
     }
 }
 
