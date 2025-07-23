@@ -61,7 +61,7 @@ function formatRelativeTime(timestamp: number): string {
 
 async function fetchWorkers() {
   try {
-    const res = await fetch('http://localhost:8900/workers');
+    const res = await fetch('http://10.10.1.2:8900/workers');
     if (!res.ok) throw new Error('Failed to fetch workers');
     workers.value = await res.json();
   } catch (err) {

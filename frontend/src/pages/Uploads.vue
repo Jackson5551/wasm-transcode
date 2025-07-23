@@ -26,7 +26,7 @@ async function submitUploads() {
         form.append('input_format', inputFormat)
         form.append('output_format', outputFormat)
 
-        const res = await fetch('http://localhost:8900/api/jobs', {
+        const res = await fetch('http://10.10.1.2:8900/api/jobs', {
           method: 'POST',
           body: form,
         })
@@ -34,23 +34,12 @@ async function submitUploads() {
         if (!res.ok) throw new Error('Upload failed')
 
         const { job_id, input_url, output_url } = await res.json()
-        console.log(`[✓] Job created:`, { job_id, input_url, output_url })
+        console.log(`Job created:`, { job_id, input_url, output_url })
 
       } catch (err) {
         console.log(err)
       }
       }
-    }
-  }
-
-  function viewJob(item) {
-    console.log('View job details:', item)
-    // TODO: Navigate to job detail page or open dialog
-  }
-
-  function downloadOutput(item) {
-    if (item.outputUrl) {
-      window.open(item.outputUrl, '_blank')
     }
   }
 </script>
