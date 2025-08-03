@@ -22,6 +22,8 @@
 import { ref, onMounted } from 'vue';
 import { VCard, VCardTitle, VDataTable, VChip } from 'vuetify/components';
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 interface WorkerMeta {
   id: string;
   job_id: string;
@@ -61,7 +63,7 @@ function formatRelativeTime(timestamp: number): string {
 
 async function fetchWorkers() {
   try {
-    const res = await fetch('http://10.10.1.2:8900/workers');
+    const res = await fetch(`http://${apiBaseUrl}/workers`);
     if (!res.ok) throw new Error('Failed to fetch workers');
     workers.value = await res.json();
   } catch (err) {

@@ -3,6 +3,8 @@ import {ref, computed, onMounted} from 'vue'
 import axios from "axios";
 import Utils from "../utils";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const search = ref('')
 const selectedMedia = ref(null)
 
@@ -33,7 +35,7 @@ const loading = ref(false);
 const fetchMedia = async ({page, itemsPerPage}) => {
   console.log(page);
   console.log(itemsPerPage);
-  await axios.get(`http://10.10.1.2:8900/api/files?page=${page}&limit=${itemsPerPage}`).then((response) => {
+  await axios.get(`http://${apiBaseUrl}/api/files?page=${page}&limit=${itemsPerPage}`).then((response) => {
     console.log(response.data)
     tableData.value = response.data
   }).catch(error => console.log(error))

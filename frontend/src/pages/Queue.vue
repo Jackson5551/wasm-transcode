@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import {useField, useForm} from "vee-validate";
 import axios from "axios";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 interface Job {
   id: string;
   file_name: string;
@@ -43,7 +45,7 @@ const loading = ref<boolean>(false);
 const getJobs = async ({page, itemsPerPage}) => {
   console.log(page);
   console.log(itemsPerPage);
-  await axios.get(`http://10.10.1.2:8900/api/jobs?page=${page}&limit=${itemsPerPage}`).then((response) => {
+  await axios.get(`http://${apiBaseUrl}/api/jobs?page=${page}&limit=${itemsPerPage}`).then((response) => {
     console.log(response.data)
     tableData.value = response.data
   }).catch(error => console.log(error))

@@ -1,6 +1,8 @@
 <script setup>
 import {ref} from 'vue'
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const files = ref([])
 const targetFormats = ref([])
 const availableFormats = ['mp3', 'wav', 'mp4', 'ogg']
@@ -26,7 +28,7 @@ async function submitUploads() {
         form.append('input_format', inputFormat)
         form.append('output_format', outputFormat)
 
-        const res = await fetch('http://10.10.1.2:8900/api/jobs', {
+        const res = await fetch(`http://${apiBaseUrl}/api/jobs`, {
           method: 'POST',
           body: form,
         })
