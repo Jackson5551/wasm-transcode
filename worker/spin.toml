@@ -12,16 +12,17 @@ component = "worker"
 
 [component.worker]
 source = "dist/worker.wasm"
-environment = { API_GATEWAY_URL = "http://localhost:8900" }
+environment = { API_GATEWAY_URL = "http://localhost:8900" } # Update before deployment
 exclude_files = ["**/node_modules"]
 allowed_outbound_hosts = [
     "http://localhost:8900",
     "http://localhost:3000",
     "http://localhost:9000",
-    "http://127.0.0.1:3000",   # 👈 must be exact
+    "http://127.0.0.1:3000",   # must be exact
     "http://127.0.0.1:9000",    # if accessing minio this way too
     "http://localhost:8081",
     "http://127.0.0.1:8081"
+    # Add host of api ageway for deployment
 ]
 allowed_http_hosts = ["http://*"]
 [component.worker.build]

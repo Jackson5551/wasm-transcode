@@ -1,9 +1,11 @@
+import { Variables } from '@fermyon/spin-sdk';
+
 async function reportJobStatus(
     job_id: string,
     status: "completed" | "failed",
     message?: string
 ) {
-    await fetch("http://localhost:8900/api/jobs/job-status", {
+    await fetch(`${Variables.get("API_GATEWAY_URL")}/api/jobs/job-status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
