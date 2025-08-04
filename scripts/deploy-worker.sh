@@ -4,7 +4,7 @@ cd ../worker || exit
 
 spin build
 
-spin up --quiet
+pm2 start "spin up" --name spin-app
 
 cd ../native-worker || exit
 
